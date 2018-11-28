@@ -1,7 +1,10 @@
+cargo-features = ["edition"]
+
 [package]
 authors = ["rchaser53 <tayoshizawa29@gmail.com>"]
 name = "inkwel-playground"
 version = "0.1.0"
+edition = "2018"
 
 [dependencies]
-inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "llvm6-0" }
+inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "llvm7-0" }
