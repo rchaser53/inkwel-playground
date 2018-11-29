@@ -1,5 +1,8 @@
 extern crate inkwell;
 
+use std::path::Path;
+use std::ffi::CString;
+
 use inkwell::OptimizationLevel;
 use inkwell::builder::Builder;
 use inkwell::context::Context;
@@ -42,21 +45,25 @@ fn jit_compile_sum(
 
 fn run() -> Result<(), Box<Error>> {
     let context = Context::create();
-    let module = context.create_module("sum");
+    let module = context.create_module("main");
     let builder = context.create_builder();
-    let execution_engine = module.create_jit_execution_engine(OptimizationLevel::None)?;
 
-    let sum = jit_compile_sum(&context, &module, &builder, &execution_engine)
-        .ok_or("Unable to JIT compile `sum`")?;
+    let i64_type = context.i64_type();
+    let fn_type = i64_type.fn_type(&[i64_type.into(), i64_type.into(), i64_type.into()], false);
 
-    let x = 1u64;
-    let y = 2u64;
-    let z = 3u64;
+    let function = module.add_function("sum", fn_type, None);
+    let basic_block = context.append_basic_block(&function, "entry");
 
-    unsafe {
-        println!("{} + {} + {} = {}", x, y, z, sum.call(x, y, z));
-        assert_eq!(sum.call(x, y, z), x + y + z);
-    }
+    builder.position_at_end(&basic_block);
+
+    let x = i64_type.const_int(1, false);
+    let y = i64_type.const_int(2, false);
+
+    let sum = builder.build_int_add(x, y, "sum");
+
+    builder.build_return(Some(&sum));
+
+    module.print_to_file(Path::new("nyan.ll"))?;
 
     Ok(())
 }
