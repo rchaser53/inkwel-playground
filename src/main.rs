@@ -1,6 +1,5 @@
 extern crate inkwell;
 
-use std::path::Path;
 use std::error::Error;
 
 mod creator;
@@ -28,7 +27,7 @@ fn run() -> Result<(), Box<Error>> {
         .build_conditional_branch(true_value, &then_bb, &else_bb);
 
     lc.builder.position_at_end(&then_bb);
-    let then_val = i64_type.const_int(1, false);
+    let then_val = lc.builder.build_int_add(i64_type.const_int(1, false), i64_type.const_int(2, false), "");
     lc.builder.build_unconditional_branch(&cont_bb);
 
     let then_bb = lc.builder.get_insert_block().unwrap();
@@ -46,7 +45,7 @@ fn run() -> Result<(), Box<Error>> {
 
     lc.builder.build_return(Some(&ret_val));
 
-    lc.module.print_to_file(Path::new("nyan.ll"))?;
+    lc.dump();
 
     Ok(())
 }
