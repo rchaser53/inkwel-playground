@@ -34,10 +34,13 @@ impl LLVMCreator {
     #[allow(dead_code)]
     pub fn emit_file(&self, filename: &str) {
         let _ = self.module.verify().map_err(|err| {
-          panic!(err.to_string());
+            panic!(err.to_string());
         });
-        let _ = self.module.print_to_file(Path::new(filename)).map_err(|err| {
-                  panic!(err.to_string());
-                });
+        let _ = self
+            .module
+            .print_to_file(Path::new(filename))
+            .map_err(|err| {
+                panic!(err.to_string());
+            });
     }
 }
