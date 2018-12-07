@@ -48,11 +48,17 @@ fn run() -> Result<(), Box<Error>> {
 
     phi.add_incoming(&[(&then_val, &then_bb), (&else_val, &else_bb)]);
 
+    let string = lc.context.const_string("my_string", true);
+    // println!("{}", string.print_to_string().to_string());
+    let string_ref = lc.builder.build_alloca(string.get_type(), "test");
+    lc.builder.build_store(string_ref, string);
+    
     let ret_val = phi.as_basic_value().into_int_value();
 
     lc.builder.build_return(Some(&ret_val));
 
     create_printf(&lc);
+    create_strcmp(&lc);
 
     lc.dump();
 
