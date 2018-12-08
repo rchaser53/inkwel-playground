@@ -3,7 +3,6 @@ extern crate inkwell;
 use inkwell::AddressSpace;
 use inkwell::module::Module;
 use inkwell::values::GlobalValue;
-// use inkwell::types::BasicTypeEnum;
 use inkwell::types::BasicType;
 
 use std::error::Error;
@@ -58,6 +57,14 @@ fn run() -> Result<(), Box<Error>> {
     // println!("{}", string.print_to_string().to_string());
     let string_ref = lc.builder.build_alloca(string.get_type(), "test");
     lc.builder.build_store(string_ref, string);
+
+    
+    let i64_array_type = i64_type.array_type(3);
+    // zeroinitializer
+    let i64_array_val = i64_array_type.const_zero();
+    let i64_array_ref = lc.builder.build_alloca(i64_array_type, "test_array");
+    lc.builder.build_store(i64_array_ref, i64_array_val);
+    // let i64_array_array = i64_array_type.const_array(&[i64_array_val, i64_array_val]);
 
     add_global(&lc.module, i64_type, "nekodesu");
 
