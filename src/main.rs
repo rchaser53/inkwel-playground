@@ -1,5 +1,11 @@
 extern crate inkwell;
 
+use inkwell::AddressSpace;
+use inkwell::module::Module;
+use inkwell::values::GlobalValue;
+// use inkwell::types::BasicTypeEnum;
+use inkwell::types::BasicType;
+
 use std::error::Error;
 
 mod creator;
@@ -52,7 +58,9 @@ fn run() -> Result<(), Box<Error>> {
     // println!("{}", string.print_to_string().to_string());
     let string_ref = lc.builder.build_alloca(string.get_type(), "test");
     lc.builder.build_store(string_ref, string);
-    
+
+    add_global(&lc.module, i64_type, "nekodesu");
+
     let ret_val = phi.as_basic_value().into_int_value();
 
     lc.builder.build_return(Some(&ret_val));
@@ -63,6 +71,10 @@ fn run() -> Result<(), Box<Error>> {
     lc.dump();
 
     Ok(())
+}
+
+pub fn add_global<T: BasicType>(module: &Module, llvm_type: T, name: &str) -> GlobalValue {
+    module.add_global(llvm_type, Some(AddressSpace::Const), name)
 }
 
 fn main() {
