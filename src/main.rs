@@ -66,6 +66,9 @@ fn run() -> Result<(), Box<Error>> {
     lc.builder.build_store(i64_array_ref, i64_array_val);
     // let i64_array_array = i64_array_type.const_array(&[i64_array_val, i64_array_val]);
 
+    let a = i64_type.const_int(1, false).get_zero_extended_constant();
+    println!("a: {}", a.unwrap());
+
     add_global(&lc.module, i64_type, "nekodesu");
 
     let ret_val = phi.as_basic_value().into_int_value();
@@ -87,3 +90,6 @@ pub fn add_global<T: BasicType>(module: &Module, llvm_type: T, name: &str) -> Gl
 fn main() {
     run().unwrap();
 }
+
+            // self.lc.builder.build_return(None);
+            // build_ret_void(self.lc.builder);
