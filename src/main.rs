@@ -1,9 +1,9 @@
 extern crate inkwell;
 
-use inkwell::AddressSpace;
 use inkwell::module::Module;
-use inkwell::values::GlobalValue;
 use inkwell::types::BasicType;
+use inkwell::values::GlobalValue;
+use inkwell::AddressSpace;
 
 use std::error::Error;
 
@@ -14,7 +14,7 @@ mod built_in;
 use self::built_in::*;
 
 fn run() -> Result<(), Box<Error>> {
-    let lc = LLVMCreator::new("main");
+    let lc = LLVMCreator::new("test_module");
 
     let i64_type = lc.context.i64_type();
     let bool_type = lc.context.bool_type();
@@ -58,7 +58,6 @@ fn run() -> Result<(), Box<Error>> {
     let string_ref = lc.builder.build_alloca(string.get_type(), "test");
     lc.builder.build_store(string_ref, string);
 
-    
     let i64_array_type = i64_type.array_type(3);
     // zeroinitializer
     let i64_array_val = i64_array_type.const_zero();
@@ -90,6 +89,3 @@ pub fn add_global<T: BasicType>(module: &Module, llvm_type: T, name: &str) -> Gl
 fn main() {
     run().unwrap();
 }
-
-            // self.lc.builder.build_return(None);
-            // build_ret_void(self.lc.builder);

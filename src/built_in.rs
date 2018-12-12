@@ -14,7 +14,7 @@ pub fn create_printf(lc: &LLVMCreator) -> FunctionValue {
 }
 
 pub fn create_strcmp(lc: &LLVMCreator) -> FunctionValue {
-    let void_type = lc.context.void_type();
+    // let void_type = lc.context.void_type();
     let int8_type = lc.context.i8_type();
     let param_type = int8_type.ptr_type(AddressSpace::Generic);
 

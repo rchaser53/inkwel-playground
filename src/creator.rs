@@ -1,9 +1,11 @@
 use std::path::Path;
 
+use inkwell::OptimizationLevel;
 use inkwell::builder::Builder;
 use inkwell::context::Context;
 use inkwell::module::Module;
 use inkwell::targets::{InitializationConfig, Target};
+use inkwell::execution_engine::{JitFunction};
 
 pub struct LLVMCreator {
     pub context: Context,
@@ -43,4 +45,41 @@ impl LLVMCreator {
                 panic!(err.to_string());
             });
     }
+}
+
+type SumFunc = unsafe extern "C" fn(u64, u64) -> u64;
+
+#[test]
+fn example_run_function() {
+  Target::initialize_native(&InitializationConfig::default()).unwrap();
+
+  let context = Context::create();
+  let module = context.create_module("test_module");
+  let builder = context.create_builder();
+  
+  create_function(&context, &module, &builder);
+  let execution_engine = module.create_jit_execution_engine(OptimizationLevel::None).unwrap();
+
+  unsafe {
+    let funcion_in_rust: JitFunction<SumFunc> = execution_engine.get_function("sum").unwrap();
+    assert!(
+      3 == funcion_in_rust.call(1, 2),
+      "test failed!"
+    );
+  };
+}
+
+#[allow(dead_code)]
+fn create_function(context: &Context, module: &Module, builder: &Builder) {
+  let i64_type = context.i64_type();
+  let fn_type = i64_type.fn_type(&[i64_type.into(), i64_type.into()], false);
+
+  let sum = module.add_function("sum", fn_type, None);
+  let basic_block = context.append_basic_block(&sum, "entry");
+  builder.position_at_end(&basic_block);
+
+  let x = sum.get_nth_param(0).unwrap().into_int_value();
+  let y = sum.get_nth_param(1).unwrap().into_int_value();
+
+  builder.build_return(Some(&builder.build_int_add(x, y, "")));
 }
